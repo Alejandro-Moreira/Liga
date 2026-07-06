@@ -4,14 +4,14 @@ Aplicación de escritorio desarrollada en Java con interfaz gráfica Swing para 
 
 ---
 
-## 🚀 Requisitos del Sistema
+## Requisitos del Sistema
 * **Java Development Kit (JDK):** Versión 17 o superior.
 * **Sistema Operativo:** Windows, macOS o Linux.
 * **Herramientas de Terminal:** Terminal estándar o PowerShell con comandos de Java configurados en la variable de entorno PATH.
 
 ---
 
-## 🛠️ Estructura del Proyecto
+## Estructura del Proyecto
 El proyecto está organizado en una arquitectura de capas limpia directamente bajo la carpeta de código fuente `src`:
 
 ```
@@ -32,7 +32,7 @@ src/
 
 ---
 
-## 💻 Instrucciones de Compilación y Ejecución
+## Instrucciones de Compilación y Ejecución
 Para ejecutar el proyecto de manera independiente a través de la terminal, sitúate en la raíz del proyecto (`SistemaJugadores/`) y ejecuta los siguientes comandos:
 
 ### 1. Compilación
@@ -51,24 +51,24 @@ java -cp out Main
 
 ---
 
-## 📸 Capturas de Pantalla del Proyecto
+## Capturas de Pantalla del Proyecto
 *(Para mostrar el diseño del sistema, puedes agregar imágenes o screenshots aquí reemplazando las rutas indicadas)*
 
 ### 1. Gestión de Jugadores y CRUD
 Visualización principal de la gestión, creación de jugadores y buscador en tiempo real.
-![Gestión de Jugadores](capturas/gestion_jugadores.png)
+![alt text](image-1.png)
 
 ### 2. Registro de Estadísticas Deportivas
 Subpantalla modal interactiva para ingresar goles, asistencias y partidos de forma independiente.
-![Registro de Estadísticas](capturas/registro_estadisticas.png)
+![alt text](image-2.png)
 
 ### 3. Ranking de Rendimiento y Reportes
 Pestaña de análisis con el ranking actualizado en tiempo real según el puntaje obtenido.
-![Ranking de Rendimiento](capturas/ranking.png)
+![alt text](image-3.png)
 
 ---
 
-## ⚙️ Funcionamiento del Sistema
+## Funcionamiento del Sistema
 
 ### 1. Módulo CRUD Completo
 * Permite **Agregar** nuevos jugadores con ID incremental autogenerado automáticamente por la capa de servicio.
@@ -95,9 +95,9 @@ $$\text{Puntaje} = (\text{Goles} \times 2.0) + (\text{Asistencias} \times 1.5)$$
 
 ---
 
-## ⚠️ Limitaciones del MVP (Minimum Viable Product)
+## Limitaciones del MVP (Minimum Viable Product)
 Dado que es una entrega del MVP, el sistema cuenta con las siguientes restricciones de alcance:
-* ❌ **Persistencia Temporal:** Toda la información se almacena en memoria (`HashMap` y `ArrayList`). Cerrar la aplicación provocará el reinicio completo de los datos.
-* ❌ **Sin Base de Datos o Archivos:** No se hace uso de bases de datos relacionales, JDBC, ni almacenamiento en archivos serializables/planos.
-* ❌ **Gestión Individual:** No se implementa administración de torneos, campeonatos, ni perfiles de equipos de manera colectiva.
-* ❌ **Sin Autenticación:** El ingreso al sistema es directo, sin perfiles de administrador ni contraseñas.
+* **Persistencia Temporal:** Toda la información se almacena en memoria (`HashMap` y `ArrayList`). Cerrar la aplicación provocará el reinicio completo de los datos.
+* **Sin Base de Datos o Archivos:** No se hace uso de bases de datos relacionales, JDBC, ni almacenamiento en archivos serializables/planos.
+* **Gestión Individual:** No se implementa administración de torneos, campeonatos, ni perfiles de equipos de manera colectiva.
+* **Sin Autenticación:** El ingreso al sistema es directo, sin perfiles de administrador ni contraseñas.
