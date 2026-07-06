@@ -1,5 +1,6 @@
 package com.appleboxestudios.futbol.ui;
 
+import com.appleboxestudios.futbol.model.Estadistica;
 import com.appleboxestudios.futbol.model.Jugador;
 import com.appleboxestudios.futbol.model.Posicion;
 import com.appleboxestudios.futbol.service.IJugadorService;
@@ -34,6 +35,7 @@ public class VentanaPrincipal extends JFrame {
     private JButton btnModificar;
     private JButton btnEliminar;
     private JButton btnLimpiar;
+    private JButton btnEstadisticas;
 
     // Componentes de búsqueda
     private JTextField txtBusqueda;
@@ -47,7 +49,9 @@ public class VentanaPrincipal extends JFrame {
     private int idSeleccionado = -1;
 
     // Columnas de la tabla
-    private static final String[] COLUMNAS = {"ID", "Nombre", "Posición", "Edad", "Equipo"};
+    private static final String[] COLUMNAS = {
+            "ID", "Nombre", "Posición", "Edad", "Equipo", "Goles", "Asistencias", "Partidos"
+    };
 
     // Bordes para retroalimentación visual de validación
     private static final Border BORDE_NORMAL = UIManager.getBorder("TextField.border");
@@ -64,9 +68,9 @@ public class VentanaPrincipal extends JFrame {
     private void initUI() {
         setTitle("Sistema de Gestión de Jugadores de Fútbol");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(850, 550);
+        setSize(1000, 600);
         setLocationRelativeTo(null);
-        setMinimumSize(new Dimension(750, 450));
+        setMinimumSize(new Dimension(900, 500));
 
         // Panel principal con BorderLayout
         JPanel panelPrincipal = new JPanel(new BorderLayout(10, 10));
@@ -140,15 +144,18 @@ public class VentanaPrincipal extends JFrame {
         btnAgregar = new JButton("Agregar");
         btnModificar = new JButton("Modificar");
         btnEliminar = new JButton("Eliminar");
+        btnEstadisticas = new JButton("Estadísticas");
         btnLimpiar = new JButton("Limpiar");
 
-        // Estado inicial: Modificar y Eliminar deshabilitados hasta seleccionar un jugador
+        // Estado inicial: Modificar, Eliminar y Estadísticas deshabilitados
         btnModificar.setEnabled(false);
         btnEliminar.setEnabled(false);
+        btnEstadisticas.setEnabled(false);
 
         botonesPanel.add(btnAgregar);
         botonesPanel.add(btnModificar);
         botonesPanel.add(btnEliminar);
+        botonesPanel.add(btnEstadisticas);
         botonesPanel.add(btnLimpiar);
 
         panel.add(botonesPanel, BorderLayout.SOUTH);
@@ -249,6 +256,7 @@ public class VentanaPrincipal extends JFrame {
         btnAgregar.addActionListener(e -> agregarJugador());
         btnModificar.addActionListener(e -> modificarJugador());
         btnEliminar.addActionListener(e -> eliminarJugador());
+        btnEstadisticas.addActionListener(e -> abrirDialogoEstadisticas());
         btnLimpiar.addActionListener(e -> limpiarFormulario());
     }
 
@@ -384,6 +392,134 @@ public class VentanaPrincipal extends JFrame {
     }
 
     /**
+     * Abre un diálogo modal para editar las estadísticas del jugador seleccionado.
+     * La edición de estadísticas es independiente de los datos personales.
+     */
+    private void abrirDialogoEstadisticas() {
+        if (idSeleccionado == -1) {
+            JOptionPane.showMessageDialog(this,
+                    "Seleccione un jugador de la tabla para editar sus estadísticas.",
+                    "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Jugador jugador = jugadorService.getById(idSeleccionado);
+        if (jugador == null) {
+            JOptionPane.showMessageDialog(this,
+                    "El jugador seleccionado ya no existe.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            limpiarFormulario();
+            actualizarTabla();
+            return;
+        }
+
+        Estadistica est = jugador.getEstadistica();
+
+        // Crear diálogo modal
+        JDialog dialogo = new JDialog(this, "Estadísticas de " + jugador.getNombre(), true);
+        dialogo.setSize(400, 280);
+        dialogo.setLocationRelativeTo(this);
+        dialogo.setResizable(false);
+
+        JPanel panelContenido = new JPanel(new BorderLayout(10, 10));
+        panelContenido.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        // Panel de campos
+        JPanel camposPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.anchor = GridBagConstraints.WEST;
+
+        // Título con nombre del jugador
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        JLabel lblTitulo = new JLabel("Jugador: " + jugador.getNombre() + " (" + jugador.getPosicion() + ")");
+        lblTitulo.setFont(lblTitulo.getFont().deriveFont(Font.BOLD, 13f));
+        camposPanel.add(lblTitulo, gbc);
+
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.NONE;
+
+        // Goles
+        gbc.gridx = 0; gbc.gridy = 1;
+        camposPanel.add(new JLabel("Goles:"), gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+        JTextField txtGoles = new JTextField(String.valueOf(est.getGoles()), 10);
+        camposPanel.add(txtGoles, gbc);
+
+        // Asistencias
+        gbc.gridx = 0; gbc.gridy = 2; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
+        camposPanel.add(new JLabel("Asistencias:"), gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+        JTextField txtAsistencias = new JTextField(String.valueOf(est.getAsistencias()), 10);
+        camposPanel.add(txtAsistencias, gbc);
+
+        // Partidos jugados
+        gbc.gridx = 0; gbc.gridy = 3; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
+        camposPanel.add(new JLabel("Partidos Jugados:"), gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+        JTextField txtPartidos = new JTextField(String.valueOf(est.getPartidosJugados()), 10);
+        camposPanel.add(txtPartidos, gbc);
+
+        panelContenido.add(camposPanel, BorderLayout.CENTER);
+
+        // Botones del diálogo
+        JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        JButton btnGuardar = new JButton("Guardar");
+        JButton btnCancelar = new JButton("Cancelar");
+
+        btnGuardar.addActionListener(e -> {
+            // Resetear bordes
+            txtGoles.setBorder(BORDE_NORMAL);
+            txtAsistencias.setBorder(BORDE_NORMAL);
+            txtPartidos.setBorder(BORDE_NORMAL);
+
+            // Validar estadísticas
+            List<String> errores = Validador.validarEstadisticas(
+                    txtGoles.getText(), txtAsistencias.getText(), txtPartidos.getText());
+
+            if (!errores.isEmpty()) {
+                // Marcar campos inválidos
+                if (!Validador.esEnteroNoNegativo(txtGoles.getText())) {
+                    txtGoles.setBorder(BORDE_ERROR);
+                }
+                if (!Validador.esEnteroNoNegativo(txtAsistencias.getText())) {
+                    txtAsistencias.setBorder(BORDE_ERROR);
+                }
+                if (!Validador.esEnteroNoNegativo(txtPartidos.getText())) {
+                    txtPartidos.setBorder(BORDE_ERROR);
+                }
+                JOptionPane.showMessageDialog(dialogo,
+                        Validador.formatearErrores(errores),
+                        "Error de validación", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Actualizar estadísticas
+            est.setGoles(Integer.parseInt(txtGoles.getText().trim()));
+            est.setAsistencias(Integer.parseInt(txtAsistencias.getText().trim()));
+            est.setPartidosJugados(Integer.parseInt(txtPartidos.getText().trim()));
+
+            jugadorService.update(jugador);
+            actualizarTabla();
+
+            JOptionPane.showMessageDialog(dialogo,
+                    "Estadísticas actualizadas exitosamente.",
+                    "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            dialogo.dispose();
+        });
+
+        btnCancelar.addActionListener(e -> dialogo.dispose());
+
+        botonesPanel.add(btnGuardar);
+        botonesPanel.add(btnCancelar);
+        panelContenido.add(botonesPanel, BorderLayout.SOUTH);
+
+        dialogo.setContentPane(panelContenido);
+        dialogo.setVisible(true);
+    }
+
+    /**
      * Marca visualmente con borde rojo los campos que tienen datos inválidos.
      * Evalúa cada campo individualmente para resaltar solo los problemáticos.
      */
@@ -430,9 +566,10 @@ public class VentanaPrincipal extends JFrame {
             // Limpiar bordes de error al cargar datos válidos
             resetearBordes();
 
-            // Habilitar botones de edición/eliminación
+            // Habilitar botones de edición/eliminación/estadísticas
             btnModificar.setEnabled(true);
             btnEliminar.setEnabled(true);
+            btnEstadisticas.setEnabled(true);
             btnAgregar.setEnabled(false);
         }
     }
@@ -454,6 +591,7 @@ public class VentanaPrincipal extends JFrame {
         btnAgregar.setEnabled(true);
         btnModificar.setEnabled(false);
         btnEliminar.setEnabled(false);
+        btnEstadisticas.setEnabled(false);
     }
 
     /**
@@ -490,12 +628,16 @@ public class VentanaPrincipal extends JFrame {
     private void cargarJugadoresEnTabla(List<Jugador> jugadores) {
         modeloTabla.setRowCount(0);
         for (Jugador j : jugadores) {
+            Estadistica est = j.getEstadistica();
             modeloTabla.addRow(new Object[]{
                     j.getId(),
                     j.getNombre(),
                     j.getPosicion().getDescripcion(),
                     j.getEdad(),
-                    j.getEquipo()
+                    j.getEquipo(),
+                    est.getGoles(),
+                    est.getAsistencias(),
+                    est.getPartidosJugados()
             });
         }
     }
