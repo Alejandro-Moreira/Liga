@@ -6,6 +6,7 @@ import com.appleboxestudios.futbol.service.IJugadorService;
 import com.appleboxestudios.futbol.util.Validador;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 /**
  * Ventana principal de la aplicación.
  * Contiene el formulario CRUD de jugadores y la tabla de visualización.
+ * Incluye validación visual con bordes rojos en campos inválidos.
  */
 public class VentanaPrincipal extends JFrame {
 
@@ -40,6 +42,10 @@ public class VentanaPrincipal extends JFrame {
 
     // Columnas de la tabla
     private static final String[] COLUMNAS = {"ID", "Nombre", "Posición", "Edad", "Equipo"};
+
+    // Bordes para retroalimentación visual de validación
+    private static final Border BORDE_NORMAL = UIManager.getBorder("TextField.border");
+    private static final Border BORDE_ERROR = BorderFactory.createLineBorder(Color.RED, 2);
 
     public VentanaPrincipal(IJugadorService jugadorService) {
         this.jugadorService = jugadorService;
@@ -187,12 +193,23 @@ public class VentanaPrincipal extends JFrame {
 
     /**
      * Agrega un nuevo jugador con los datos del formulario.
+     * Valida todos los campos y muestra errores acumulados si los hay.
      */
     private void agregarJugador() {
-        // Validar campos
-        String error = validarCampos();
-        if (error != null) {
-            JOptionPane.showMessageDialog(this, error, "Error de validación",
+        // Limpiar bordes previos antes de validar
+        resetearBordes();
+
+        // Validar campos con el nuevo sistema que acumula errores
+        List<String> errores = Validador.validarJugador(
+                txtNombre.getText(),
+                txtEdad.getText(),
+                txtEquipo.getText()
+        );
+
+        if (!errores.isEmpty()) {
+            marcarCamposInvalidos();
+            String mensajeError = Validador.formatearErrores(errores);
+            JOptionPane.showMessageDialog(this, mensajeError, "Error de validación",
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -216,6 +233,7 @@ public class VentanaPrincipal extends JFrame {
 
     /**
      * Modifica los datos del jugador seleccionado.
+     * Valida todos los campos antes de aplicar cambios.
      */
     private void modificarJugador() {
         if (idSeleccionado == -1) {
@@ -225,10 +243,20 @@ public class VentanaPrincipal extends JFrame {
             return;
         }
 
+        // Limpiar bordes previos antes de validar
+        resetearBordes();
+
         // Validar campos
-        String error = validarCampos();
-        if (error != null) {
-            JOptionPane.showMessageDialog(this, error, "Error de validación",
+        List<String> errores = Validador.validarJugador(
+                txtNombre.getText(),
+                txtEdad.getText(),
+                txtEquipo.getText()
+        );
+
+        if (!errores.isEmpty()) {
+            marcarCamposInvalidos();
+            String mensajeError = Validador.formatearErrores(errores);
+            JOptionPane.showMessageDialog(this, mensajeError, "Error de validación",
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -295,20 +323,28 @@ public class VentanaPrincipal extends JFrame {
     }
 
     /**
-     * Valida los campos del formulario.
-     * @return mensaje de error si hay problemas, null si todo es válido
+     * Marca visualmente con borde rojo los campos que tienen datos inválidos.
+     * Evalúa cada campo individualmente para resaltar solo los problemáticos.
      */
-    private String validarCampos() {
+    private void marcarCamposInvalidos() {
         if (!Validador.esTextoValido(txtNombre.getText())) {
-            return "El campo 'Nombre' es obligatorio.";
+            txtNombre.setBorder(BORDE_ERROR);
         }
         if (!Validador.esEnteroPositivo(txtEdad.getText())) {
-            return "El campo 'Edad' debe ser un número entero positivo.";
+            txtEdad.setBorder(BORDE_ERROR);
         }
         if (!Validador.esTextoValido(txtEquipo.getText())) {
-            return "El campo 'Equipo' es obligatorio.";
+            txtEquipo.setBorder(BORDE_ERROR);
         }
-        return null;
+    }
+
+    /**
+     * Restaura los bordes de todos los campos de texto a su estado normal.
+     */
+    private void resetearBordes() {
+        txtNombre.setBorder(BORDE_NORMAL);
+        txtEdad.setBorder(BORDE_NORMAL);
+        txtEquipo.setBorder(BORDE_NORMAL);
     }
 
     /**
@@ -330,6 +366,9 @@ public class VentanaPrincipal extends JFrame {
             txtEdad.setText(String.valueOf(jugador.getEdad()));
             txtEquipo.setText(jugador.getEquipo());
 
+            // Limpiar bordes de error al cargar datos válidos
+            resetearBordes();
+
             // Habilitar botones de edición/eliminación
             btnModificar.setEnabled(true);
             btnEliminar.setEnabled(true);
@@ -349,7 +388,8 @@ public class VentanaPrincipal extends JFrame {
 
         tablaJugadores.clearSelection();
 
-        // Restaurar estado de botones
+        // Restaurar bordes y estado de botones
+        resetearBordes();
         btnAgregar.setEnabled(true);
         btnModificar.setEnabled(false);
         btnEliminar.setEnabled(false);
