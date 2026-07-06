@@ -60,7 +60,7 @@ Visualización principal de la gestión, creación de jugadores y buscador en ti
 ### 2. Registro de Estadísticas Deportivas
 Subpantalla modal interactiva para ingresar goles, asistencias y partidos de forma independiente.
 
-![alt text] (image-2.png)
+![alt text](image-2.png)
 
 ### 3. Ranking de Rendimiento y Reportes
 Pestaña de análisis con el ranking actualizado en tiempo real según el puntaje obtenido.

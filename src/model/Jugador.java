@@ -1,10 +1,5 @@
 package model;
 
-/**
- * Entidad principal que representa a un jugador de fútbol.
- * Contiene datos personales y una referencia a sus estadísticas deportivas.
- * El ID es asignado por el servicio y es inmutable una vez establecido.
- */
 public class Jugador {
 
     private int id;
@@ -17,10 +12,11 @@ public class Jugador {
     /**
      * Constructor completo para crear un jugador.
      * La estadística se inicializa en 0 automáticamente.
-     * @param nombre nombre completo del jugador
+     * 
+     * @param nombre   nombre completo del jugador
      * @param posicion posición en la cancha
-     * @param edad edad del jugador
-     * @param equipo nombre del equipo
+     * @param edad     edad del jugador
+     * @param equipo   nombre del equipo
      */
     public Jugador(String nombre, Posicion posicion, int edad, String equipo) {
         this.nombre = nombre;
@@ -30,14 +26,13 @@ public class Jugador {
         this.estadistica = new Estadistica();
     }
 
-    // --- Getters y Setters ---
-
     public int getId() {
         return id;
     }
 
     /**
      * El ID solo debe ser asignado por JugadorService.
+     * 
      * @param id identificador único autogenerado
      */
     public void setId(int id) {
@@ -87,6 +82,7 @@ public class Jugador {
     /**
      * Calcula el puntaje de rendimiento deportivo del jugador.
      * Fórmula: (Goles * 2) + (Asistencias * 1.5)
+     * 
      * @return puntaje de rendimiento
      */
     public double getPuntajeRendimiento() {
