@@ -52,18 +52,19 @@ java -cp out Main
 ---
 
 ## Capturas de Pantalla del Proyecto
-*(Para mostrar el diseño del sistema, puedes agregar imágenes o screenshots aquí reemplazando las rutas indicadas)*
-
 ### 1. Gestión de Jugadores y CRUD
 Visualización principal de la gestión, creación de jugadores y buscador en tiempo real.
+
 ![alt text](image-1.png)
 
 ### 2. Registro de Estadísticas Deportivas
 Subpantalla modal interactiva para ingresar goles, asistencias y partidos de forma independiente.
+
 ![alt text](image-2.png)
 
 ### 3. Ranking de Rendimiento y Reportes
 Pestaña de análisis con el ranking actualizado en tiempo real según el puntaje obtenido.
+
 ![alt text](image-3.png)
 
 ---
