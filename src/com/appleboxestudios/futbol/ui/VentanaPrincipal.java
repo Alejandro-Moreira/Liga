@@ -7,6 +7,8 @@ import com.appleboxestudios.futbol.util.Validador;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
@@ -32,6 +34,10 @@ public class VentanaPrincipal extends JFrame {
     private JButton btnModificar;
     private JButton btnEliminar;
     private JButton btnLimpiar;
+
+    // Componentes de búsqueda
+    private JTextField txtBusqueda;
+    private JButton btnLimpiarBusqueda;
 
     // Tabla de jugadores
     private JTable tablaJugadores;
@@ -66,9 +72,17 @@ public class VentanaPrincipal extends JFrame {
         JPanel panelPrincipal = new JPanel(new BorderLayout(10, 10));
         panelPrincipal.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // --- Panel superior: Formulario ---
+        // --- Panel superior: Formulario + Búsqueda ---
+        JPanel panelSuperior = new JPanel();
+        panelSuperior.setLayout(new BoxLayout(panelSuperior, BoxLayout.Y_AXIS));
+
         JPanel panelFormulario = crearPanelFormulario();
-        panelPrincipal.add(panelFormulario, BorderLayout.NORTH);
+        panelSuperior.add(panelFormulario);
+
+        JPanel panelBusqueda = crearPanelBusqueda();
+        panelSuperior.add(panelBusqueda);
+
+        panelPrincipal.add(panelSuperior, BorderLayout.NORTH);
 
         // --- Panel central: Tabla ---
         JPanel panelTabla = crearPanelTabla();
@@ -141,6 +155,53 @@ public class VentanaPrincipal extends JFrame {
 
         // Registrar listeners
         registrarListeners();
+
+        return panel;
+    }
+
+    /**
+     * Crea el panel de búsqueda con campo de texto y botón para limpiar filtro.
+     * El filtrado se realiza en tiempo real mientras el usuario escribe.
+     */
+    private JPanel crearPanelBusqueda() {
+        JPanel panel = new JPanel(new BorderLayout(10, 5));
+        panel.setBorder(BorderFactory.createTitledBorder("Buscar Jugador"));
+
+        // Campo de búsqueda con icono de lupa textual
+        JPanel campoBusqueda = new JPanel(new BorderLayout(5, 0));
+        campoBusqueda.add(new JLabel("  \uD83D\uDD0D Nombre:"), BorderLayout.WEST);
+        txtBusqueda = new JTextField(20);
+        campoBusqueda.add(txtBusqueda, BorderLayout.CENTER);
+
+        // Botón para limpiar búsqueda
+        btnLimpiarBusqueda = new JButton("Limpiar Filtro");
+        campoBusqueda.add(btnLimpiarBusqueda, BorderLayout.EAST);
+
+        panel.add(campoBusqueda, BorderLayout.CENTER);
+
+        // Filtrado en tiempo real con DocumentListener
+        txtBusqueda.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filtrarTabla();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filtrarTabla();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                filtrarTabla();
+            }
+        });
+
+        // Listener para limpiar búsqueda
+        btnLimpiarBusqueda.addActionListener(e -> {
+            txtBusqueda.setText("");
+            actualizarTabla();
+        });
 
         return panel;
     }
@@ -397,10 +458,37 @@ public class VentanaPrincipal extends JFrame {
 
     /**
      * Actualiza la tabla con la lista completa de jugadores del servicio.
+     * Si hay un filtro de búsqueda activo, aplica el filtro automáticamente.
      */
     public void actualizarTabla() {
-        modeloTabla.setRowCount(0); // Limpiar filas actuales
-        List<Jugador> jugadores = jugadorService.getAll();
+        String textoBusqueda = (txtBusqueda != null) ? txtBusqueda.getText().trim() : "";
+        if (!textoBusqueda.isEmpty()) {
+            filtrarTabla();
+        } else {
+            cargarJugadoresEnTabla(jugadorService.getAll());
+        }
+    }
+
+    /**
+     * Filtra la tabla mostrando solo los jugadores cuyo nombre coincida
+     * parcialmente con el texto de búsqueda (insensible a mayúsculas).
+     */
+    private void filtrarTabla() {
+        String textoBusqueda = txtBusqueda.getText().trim();
+        if (textoBusqueda.isEmpty()) {
+            cargarJugadoresEnTabla(jugadorService.getAll());
+        } else {
+            List<Jugador> resultados = jugadorService.findByNombre(textoBusqueda);
+            cargarJugadoresEnTabla(resultados);
+        }
+    }
+
+    /**
+     * Carga una lista de jugadores en la tabla.
+     * Método auxiliar usado tanto por actualizarTabla como por filtrarTabla.
+     */
+    private void cargarJugadoresEnTabla(List<Jugador> jugadores) {
+        modeloTabla.setRowCount(0);
         for (Jugador j : jugadores) {
             modeloTabla.addRow(new Object[]{
                     j.getId(),
