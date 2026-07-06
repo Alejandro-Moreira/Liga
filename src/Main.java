@@ -1,7 +1,5 @@
-package com.appleboxestudios.futbol;
-
-import com.appleboxestudios.futbol.service.JugadorService;
-import com.appleboxestudios.futbol.ui.VentanaPrincipal;
+import service.JugadorService;
+import ui.VentanaPrincipal;
 
 import javax.swing.*;
 

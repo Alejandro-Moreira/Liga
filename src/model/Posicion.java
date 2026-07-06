@@ -1,4 +1,4 @@
-package com.appleboxestudios.futbol.model;
+package model;
 
 /**
  * Enum que representa las posiciones disponibles para un jugador de fútbol.

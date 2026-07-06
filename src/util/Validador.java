@@ -1,4 +1,4 @@
-package com.appleboxestudios.futbol.util;
+package util;
 
 import java.util.ArrayList;
 import java.util.List;

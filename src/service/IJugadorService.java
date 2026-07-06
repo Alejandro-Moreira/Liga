@@ -1,6 +1,6 @@
-package com.appleboxestudios.futbol.service;
+package service;
 
-import com.appleboxestudios.futbol.model.Jugador;
+import model.Jugador;
 import java.util.List;
 
 /**

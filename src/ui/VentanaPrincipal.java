@@ -1,10 +1,10 @@
-package com.appleboxestudios.futbol.ui;
+package ui;
 
-import com.appleboxestudios.futbol.model.Estadistica;
-import com.appleboxestudios.futbol.model.Jugador;
-import com.appleboxestudios.futbol.model.Posicion;
-import com.appleboxestudios.futbol.service.IJugadorService;
-import com.appleboxestudios.futbol.util.Validador;
+import model.Estadistica;
+import model.Jugador;
+import model.Posicion;
+import service.IJugadorService;
+import util.Validador;
 
 import javax.swing.*;
 import javax.swing.border.Border;

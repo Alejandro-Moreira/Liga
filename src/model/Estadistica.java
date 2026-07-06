@@ -1,4 +1,4 @@
-package com.appleboxestudios.futbol.model;
+package model;
 
 /**
  * Clase que encapsula las estadísticas deportivas de un jugador.

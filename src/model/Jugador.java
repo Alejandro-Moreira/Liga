@@ -1,4 +1,4 @@
-package com.appleboxestudios.futbol.model;
+package model;
 
 /**
  * Entidad principal que representa a un jugador de fútbol.
