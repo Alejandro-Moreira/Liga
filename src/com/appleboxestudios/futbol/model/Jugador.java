@@ -84,6 +84,18 @@ public class Jugador {
         this.estadistica = estadistica;
     }
 
+    /**
+     * Calcula el puntaje de rendimiento deportivo del jugador.
+     * Fórmula: (Goles * 2) + (Asistencias * 1.5)
+     * @return puntaje de rendimiento
+     */
+    public double getPuntajeRendimiento() {
+        if (estadistica == null) {
+            return 0.0;
+        }
+        return (estadistica.getGoles() * 2.0) + (estadistica.getAsistencias() * 1.5);
+    }
+
     @Override
     public String toString() {
         return "Jugador{id=" + id + ", nombre='" + nombre + "', posicion=" + posicion

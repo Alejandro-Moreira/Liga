@@ -45,6 +45,10 @@ public class VentanaPrincipal extends JFrame {
     private JTable tablaJugadores;
     private DefaultTableModel modeloTabla;
 
+    // Tabla de ranking
+    private JTable tablaRanking;
+    private DefaultTableModel modeloTablaRanking;
+
     // ID del jugador seleccionado para edición (-1 = ninguno)
     private int idSeleccionado = -1;
 
@@ -68,15 +72,16 @@ public class VentanaPrincipal extends JFrame {
     private void initUI() {
         setTitle("Sistema de Gestión de Jugadores de Fútbol");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 600);
+        setSize(1000, 650);
         setLocationRelativeTo(null);
-        setMinimumSize(new Dimension(900, 500));
+        setMinimumSize(new Dimension(900, 550));
 
-        // Panel principal con BorderLayout
-        JPanel panelPrincipal = new JPanel(new BorderLayout(10, 10));
-        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        JTabbedPane tabbedPane = new JTabbedPane();
 
-        // --- Panel superior: Formulario + Búsqueda ---
+        // --- Pestaña 1: Gestión de Jugadores ---
+        JPanel panelGestion = new JPanel(new BorderLayout(10, 10));
+        panelGestion.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
         JPanel panelSuperior = new JPanel();
         panelSuperior.setLayout(new BoxLayout(panelSuperior, BoxLayout.Y_AXIS));
 
@@ -86,13 +91,25 @@ public class VentanaPrincipal extends JFrame {
         JPanel panelBusqueda = crearPanelBusqueda();
         panelSuperior.add(panelBusqueda);
 
-        panelPrincipal.add(panelSuperior, BorderLayout.NORTH);
+        panelGestion.add(panelSuperior, BorderLayout.NORTH);
 
-        // --- Panel central: Tabla ---
         JPanel panelTabla = crearPanelTabla();
-        panelPrincipal.add(panelTabla, BorderLayout.CENTER);
+        panelGestion.add(panelTabla, BorderLayout.CENTER);
 
-        setContentPane(panelPrincipal);
+        tabbedPane.addTab("Gestión de Jugadores", panelGestion);
+
+        // --- Pestaña 2: Ranking y Rendimiento ---
+        JPanel panelRanking = crearPanelRanking();
+        tabbedPane.addTab("Ranking de Rendimiento", panelRanking);
+
+        // Listener para actualizar el ranking al cambiar de pestaña
+        tabbedPane.addChangeListener(e -> {
+            if (tabbedPane.getSelectedIndex() == 1) {
+                actualizarRanking();
+            }
+        });
+
+        setContentPane(tabbedPane);
     }
 
     /**
@@ -520,6 +537,81 @@ public class VentanaPrincipal extends JFrame {
     }
 
     /**
+     * Crea el panel para la pestaña de ranking de rendimiento.
+     */
+    private JPanel crearPanelRanking() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Cabecera del panel de ranking
+        JPanel panelCabecera = new JPanel(new BorderLayout());
+        JLabel lblTitulo = new JLabel("Ranking de Rendimiento Deportivo (Top Jugadores)");
+        lblTitulo.setFont(lblTitulo.getFont().deriveFont(Font.BOLD, 16f));
+        panelCabecera.add(lblTitulo, BorderLayout.WEST);
+
+        JLabel lblFormula = new JLabel("Fórmula: Puntaje = (Goles * 2) + (Asistencias * 1.5)");
+        lblFormula.setFont(lblFormula.getFont().deriveFont(Font.ITALIC, 11f));
+        panelFormulaColor(lblFormula);
+        panelCabecera.add(lblFormula, BorderLayout.EAST);
+        panel.add(panelCabecera, BorderLayout.NORTH);
+
+        // Tabla de ranking
+        String[] columnasRanking = {
+                "Puesto", "Nombre", "Posición", "Equipo", "Goles", "Asistencias", "Partidos", "Puntaje"
+        };
+
+        modeloTablaRanking = new DefaultTableModel(columnasRanking, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        tablaRanking = new JTable(modeloTablaRanking);
+        tablaRanking.getTableHeader().setReorderingAllowed(false);
+
+        // Ajustar columnas
+        tablaRanking.getColumnModel().getColumn(0).setPreferredWidth(60);
+        tablaRanking.getColumnModel().getColumn(0).setMaxWidth(80);
+        tablaRanking.getColumnModel().getColumn(7).setPreferredWidth(80);
+
+        JScrollPane scrollPane = new JScrollPane(tablaRanking);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private void panelFormulaColor(JLabel label) {
+        label.setForeground(Color.BLUE.darker());
+    }
+
+    /**
+     * Llena la tabla de ranking con la lista ordenada de jugadores.
+     */
+    private void actualizarRanking() {
+        if (modeloTablaRanking == null) {
+            return;
+        }
+        modeloTablaRanking.setRowCount(0);
+        List<Jugador> ranking = jugadorService.getRanking();
+        int puesto = 1;
+        for (Jugador j : ranking) {
+            Estadistica est = j.getEstadistica();
+            modeloTablaRanking.addRow(new Object[]{
+                    puesto + "º",
+                    j.getNombre(),
+                    j.getPosicion().getDescripcion(),
+                    j.getEquipo(),
+                    est.getGoles(),
+                    est.getAsistencias(),
+                    est.getPartidosJugados(),
+                    String.format("%.1f", j.getPuntajeRendimiento())
+            });
+            puesto++;
+        }
+    }
+
+    /**
      * Marca visualmente con borde rojo los campos que tienen datos inválidos.
      * Evalúa cada campo individualmente para resaltar solo los problemáticos.
      */
@@ -605,6 +697,8 @@ public class VentanaPrincipal extends JFrame {
         } else {
             cargarJugadoresEnTabla(jugadorService.getAll());
         }
+        // Actualizar ranking en tiempo real
+        actualizarRanking();
     }
 
     /**

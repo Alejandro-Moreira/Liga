@@ -64,4 +64,29 @@ public class JugadorService implements IJugadorService {
         }
         return resultados;
     }
+
+    @Override
+    public List<Jugador> getRanking() {
+        List<Jugador> ranking = new ArrayList<>(jugadores.values());
+        ranking.sort((j1, j2) -> {
+            // 1. Criterio principal: Mayor puntaje primero (orden descendente)
+            int comparacionPuntaje = Double.compare(j2.getPuntajeRendimiento(), j1.getPuntajeRendimiento());
+            if (comparacionPuntaje != 0) {
+                return comparacionPuntaje;
+            }
+
+            // 2. Criterio de desempate: Menos partidos jugados primero (orden ascendente)
+            int comparacionPartidos = Integer.compare(
+                    j1.getEstadistica().getPartidosJugados(),
+                    j2.getEstadistica().getPartidosJugados()
+            );
+            if (comparacionPartidos != 0) {
+                return comparacionPartidos;
+            }
+
+            // 3. Criterio final: Orden alfabético por nombre
+            return j1.getNombre().compareToIgnoreCase(j2.getNombre());
+        });
+        return ranking;
+    }
 }

@@ -48,4 +48,12 @@ public interface IJugadorService {
      * @return lista de jugadores que coinciden
      */
     List<Jugador> findByNombre(String nombre);
+
+    /**
+     * Obtiene la lista de jugadores ordenada por su ranking de rendimiento deportivo.
+     * Criterio: Mayor puntaje primero. Si hay empate, menor cantidad de partidos jugados.
+     * Si persiste, orden alfabético por nombre.
+     * @return lista ordenada de jugadores
+     */
+    List<Jugador> getRanking();
 }
